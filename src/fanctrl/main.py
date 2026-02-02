@@ -164,23 +164,32 @@ def setup_gpio(cfg: dict):
         log("WARN: Running with MOCK GPIO")
         return {"backend": "mock", "line": type("MockLine", (), {"set_value": lambda s, v: None, "release": lambda s: None})(), "chip": type("MockChip", (), {"close": lambda s: None})()}, cfg["gpio_pin"]
 
-    if (
-        hasattr(gpiod, "request_lines")
-        and hasattr(gpiod, "LineSettings")
-        and hasattr(gpiod, "LineDirection")
-    ):
+    if hasattr(gpiod, "request_lines") and hasattr(gpiod, "LineSettings"):
         default_off = 0 if cfg["active_high"] else 1
         try:
-            value_enum = (
-                gpiod.LineValue.ACTIVE if default_off == 1 else gpiod.LineValue.INACTIVE
-            )
+            value_cls = getattr(gpiod, "LineValue", None) or getattr(gpiod, "Value", None)
+            if value_cls is None:
+                raise AttributeError("No LineValue/Value enum found")
+            value_enum = value_cls.ACTIVE if default_off == 1 else value_cls.INACTIVE
         except Exception:
             value_enum = default_off
 
-        settings = gpiod.LineSettings(
-            direction=gpiod.LineDirection.OUTPUT,
-            output_value=value_enum,
-        )
+        direction_enum = None
+        if hasattr(gpiod, "LineDirection"):
+            direction_enum = gpiod.LineDirection.OUTPUT
+        elif hasattr(gpiod, "Direction"):
+            direction_enum = gpiod.Direction.OUTPUT
+
+        try:
+            if direction_enum is None:
+                settings = gpiod.LineSettings(output_value=value_enum)
+            else:
+                settings = gpiod.LineSettings(
+                    direction=direction_enum,
+                    output_value=value_enum,
+                )
+        except TypeError:
+            settings = gpiod.LineSettings(output_value=value_enum)
 
         request = gpiod.request_lines(
             chip_path,
@@ -196,11 +205,12 @@ def setup_gpio(cfg: dict):
 
             def set_value(self, value):
                 try:
-                    val = (
-                        self._gpiod.LineValue.ACTIVE
-                        if value
-                        else self._gpiod.LineValue.INACTIVE
+                    value_cls = getattr(self._gpiod, "LineValue", None) or getattr(
+                        self._gpiod, "Value", None
                     )
+                    if value_cls is None:
+                        raise AttributeError("No LineValue/Value enum found")
+                    val = value_cls.ACTIVE if value else value_cls.INACTIVE
                 except Exception:
                     val = value
                 self._req.set_value(self._offset, val)
