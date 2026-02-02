@@ -8,6 +8,9 @@ A lightweight Python tool to control a fan based on system temperature, using `l
 - **Status API**: Simple HTTP endpoint to monitor current state.
 - **Safety**: Failsafe defaults if config is invalid or sensor reading fails.
 
+## Home Assistant
+If you are looking for the Home Assistant Add-on, find it here: [ha-addon-fanctrl](https://github.com/m00sfett/ha-addon-fanctrl)
+
 ## Installation
 
 ### From Source
