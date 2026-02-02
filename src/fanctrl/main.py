@@ -164,8 +164,18 @@ def setup_gpio(cfg: dict):
         log("WARN: Running with MOCK GPIO")
         return {"backend": "mock", "line": type("MockLine", (), {"set_value": lambda s, v: None, "release": lambda s: None})(), "chip": type("MockChip", (), {"close": lambda s: None})()}, cfg["gpio_pin"]
 
-    chip = gpiod.Chip(cfg["gpio_chip"])
-    line = chip.get_line(cfg["gpio_pin"])
+    chip = None
+    try:
+        chip = gpiod.Chip(cfg["gpio_chip"])
+    except FileNotFoundError:
+        chip = gpiod.Chip(chip_path)
+
+    try:
+        line = chip.get_line(cfg["gpio_pin"])
+    except Exception as exc:
+        raise FileNotFoundError(
+            f"GPIO line not found: chip={cfg['gpio_chip']} pin={cfg['gpio_pin']} (path={chip_path})"
+        ) from exc
     default_off = 0 if cfg["active_high"] else 1
     line.request(consumer="fanctrl", type=gpiod.LINE_REQ_DIR_OUT, default_vals=[default_off])
     return {"backend": "gpiod", "chip": chip, "line": line, "pin": cfg["gpio_pin"]}, cfg["gpio_pin"]
