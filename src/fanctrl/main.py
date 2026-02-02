@@ -164,7 +164,11 @@ def setup_gpio(cfg: dict):
         log("WARN: Running with MOCK GPIO")
         return {"backend": "mock", "line": type("MockLine", (), {"set_value": lambda s, v: None, "release": lambda s: None})(), "chip": type("MockChip", (), {"close": lambda s: None})()}, cfg["gpio_pin"]
 
-    if hasattr(gpiod, "request_lines") and hasattr(gpiod, "LineSettings"):
+    if (
+        hasattr(gpiod, "request_lines")
+        and hasattr(gpiod, "LineSettings")
+        and hasattr(gpiod, "LineDirection")
+    ):
         default_off = 0 if cfg["active_high"] else 1
         try:
             value_enum = (
