@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "fanctrl"
-version = "0.3.12"
+version = "0.3.13"
 description = "Temperature-based fan control via GPIO"
 readme = "README.md"
 requires-python = ">=3.10"
