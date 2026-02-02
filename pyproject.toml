@@ -4,13 +4,13 @@ build-backend = "hatchling.build"
 
 [project]
 name = "fanctrl"
-version = "0.3.1"
+version = "0.3.2"
 description = "Temperature-based fan control via GPIO"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [
-  { name = "FanCtrl Developer", email = "dev@example.com" },
+  { name = "Tobias (m00sfett)", email = "27900324+m00sfett@users.noreply.github.com" },
 ]
 dependencies = [
     "tomli; python_version < '3.11'",

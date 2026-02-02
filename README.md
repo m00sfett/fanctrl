@@ -15,7 +15,7 @@ If you are looking for the Home Assistant Add-on, find it here: [ha-addon-fanctr
 
 ### From Source
 ```bash
-git clone https://github.com/yourusername/fanctrl.git
+git clone https://github.com/m00sfett/fanctrl.git
 cd fanctrl/fanctrl
 pip install .
 ```
