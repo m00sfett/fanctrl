@@ -20,6 +20,30 @@ cd fanctrl/fanctrl
 pip install .
 ```
 
+### Docker (Raspberry Pi OS / Docker)
+1. Clone the repo and create a config:
+```bash
+git clone https://github.com/m00sfett/fanctrl.git
+cd fanctrl/fanctrl
+mkdir -p config
+cp config/fanctrl.toml config/fanctrl.toml
+```
+
+2. Start with Docker Compose:
+```bash
+docker compose up -d --build
+```
+
+3. Logs:
+```bash
+docker compose logs -f fanctrl
+```
+
+**Notes**
+- Ensure GPIO devices are passed through (`/dev/gpiochip*`, optionally `/dev/gpiomem`).
+- If your Pi exposes GPIO on a different chip, set `gpio_chip` in the config.
+- The status endpoint is available on port `9101`.
+
 ## Usage
 
 Run the tool directly:
@@ -69,6 +93,6 @@ Returns:
   "temp_c": 56.2,
   "temp_on_c": 55.0,
   "temp_off_c": 45.0,
-  "version": "0.2.1"
+  "version": "0.4.0"
 }
 ```

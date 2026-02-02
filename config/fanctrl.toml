@@ -1,0 +1,16 @@
+[fan]
+# GPIO Settings
+gpio_chip = "gpiochip0"  # The GPIO character device
+# BCM line offset (NOT physical pin number)
+gpio_pin = 13
+active_high = true
+
+# Temperature Thresholds (Celsius)
+temp_on_c = 55.0
+temp_off_c = 45.0
+temp_path = "/sys/class/thermal/thermal_zone0/temp"
+
+# Timing
+poll_interval_s = 5.0
+min_switch_s = 10.0
+log_each_read = false

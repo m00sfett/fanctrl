@@ -1,0 +1,19 @@
+services:
+  fanctrl:
+    build: .
+    container_name: fanctrl
+    restart: unless-stopped
+    environment:
+      - FANCTRL_CONFIG=/config/fanctrl.toml
+      - FANCTRL_STATUS_PORT=9101
+    ports:
+      - "9101:9101"
+    volumes:
+      - ./config:/config:ro
+      - /sys:/sys:ro
+    devices:
+      - /dev/gpiomem:/dev/gpiomem
+      - /dev/gpiochip0:/dev/gpiochip0
+      - /dev/gpiochip1:/dev/gpiochip1
+    cap_add:
+      - SYS_RAWIO
