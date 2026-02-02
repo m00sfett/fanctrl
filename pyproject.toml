@@ -1,0 +1,26 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "fanctrl"
+version = "0.3.0"
+description = "Temperature-based fan control via GPIO"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+  { name = "FanCtrl Developer", email = "dev@example.com" },
+]
+dependencies = [
+    "tomli; python_version < '3.11'",
+    # gpiod is usually a system package on Alpine/Debian or installed separately.
+    # We can list it here if we assume it's available on PyPI or rely on system site-packages.
+    # For now, we assume the environment provides it or it's installed manually.
+]
+
+[project.scripts]
+fanctrl = "fanctrl.main:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/fanctrl"]
