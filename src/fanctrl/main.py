@@ -164,6 +164,51 @@ def setup_gpio(cfg: dict):
         log("WARN: Running with MOCK GPIO")
         return {"backend": "mock", "line": type("MockLine", (), {"set_value": lambda s, v: None, "release": lambda s: None})(), "chip": type("MockChip", (), {"close": lambda s: None})()}, cfg["gpio_pin"]
 
+    if hasattr(gpiod, "request_lines") and hasattr(gpiod, "LineSettings"):
+        default_off = 0 if cfg["active_high"] else 1
+        try:
+            value_enum = (
+                gpiod.LineValue.ACTIVE if default_off == 1 else gpiod.LineValue.INACTIVE
+            )
+        except Exception:
+            value_enum = default_off
+
+        settings = gpiod.LineSettings(
+            direction=gpiod.LineDirection.OUTPUT,
+            output_value=value_enum,
+        )
+
+        request = gpiod.request_lines(
+            chip_path,
+            consumer="fanctrl",
+            config={cfg["gpio_pin"]: settings},
+        )
+
+        class V2Line:
+            def __init__(self, req, offset, gpiod_mod):
+                self._req = req
+                self._offset = offset
+                self._gpiod = gpiod_mod
+
+            def set_value(self, value):
+                try:
+                    val = (
+                        self._gpiod.LineValue.ACTIVE
+                        if value
+                        else self._gpiod.LineValue.INACTIVE
+                    )
+                except Exception:
+                    val = value
+                self._req.set_value(self._offset, val)
+
+            def release(self):
+                self._req.release()
+
+        return {
+            "backend": "gpiod-v2",
+            "line": V2Line(request, cfg["gpio_pin"], gpiod),
+        }, cfg["gpio_pin"]
+
     chip = None
     try:
         chip = gpiod.Chip(cfg["gpio_chip"])
@@ -173,8 +218,8 @@ def setup_gpio(cfg: dict):
     try:
         line = chip.get_line(cfg["gpio_pin"])
     except Exception as exc:
-        raise FileNotFoundError(
-            f"GPIO line not found: chip={cfg['gpio_chip']} pin={cfg['gpio_pin']} (path={chip_path})"
+        raise RuntimeError(
+            f"GPIO line request failed: chip={cfg['gpio_chip']} pin={cfg['gpio_pin']} (path={chip_path}): {exc}"
         ) from exc
     default_off = 0 if cfg["active_high"] else 1
     line.request(consumer="fanctrl", type=gpiod.LINE_REQ_DIR_OUT, default_vals=[default_off])
@@ -182,7 +227,7 @@ def setup_gpio(cfg: dict):
 
 
 def cleanup_gpio(ctx: dict) -> None:
-    if ctx.get("backend") == "gpiod":
+    if ctx.get("backend") in {"gpiod", "gpiod-v2"}:
         if "line" in ctx:
             ctx["line"].release()
         if "chip" in ctx:
