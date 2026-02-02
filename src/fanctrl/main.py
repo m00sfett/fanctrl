@@ -166,30 +166,37 @@ def setup_gpio(cfg: dict):
 
     if hasattr(gpiod, "request_lines") and hasattr(gpiod, "LineSettings"):
         default_off = 0 if cfg["active_high"] else 1
-        try:
-            value_cls = getattr(gpiod, "LineValue", None) or getattr(gpiod, "Value", None)
-            if value_cls is None:
-                raise AttributeError("No LineValue/Value enum found")
-            value_enum = value_cls.ACTIVE if default_off == 1 else value_cls.INACTIVE
-        except Exception:
-            value_enum = default_off
+        line_mod = getattr(gpiod, "line", None)
+        value_cls = (
+            getattr(gpiod, "LineValue", None)
+            or getattr(gpiod, "Value", None)
+            or getattr(line_mod, "Value", None)
+        )
+        value_enum = None
+        if value_cls is not None:
+            try:
+                value_enum = value_cls.ACTIVE if default_off == 1 else value_cls.INACTIVE
+            except Exception:
+                value_enum = None
 
         direction_enum = None
         if hasattr(gpiod, "LineDirection"):
             direction_enum = gpiod.LineDirection.OUTPUT
         elif hasattr(gpiod, "Direction"):
             direction_enum = gpiod.Direction.OUTPUT
+        elif line_mod is not None and hasattr(line_mod, "Direction"):
+            direction_enum = line_mod.Direction.OUTPUT
+
+        settings_kwargs = {}
+        if direction_enum is not None:
+            settings_kwargs["direction"] = direction_enum
+        if value_enum is not None:
+            settings_kwargs["output_value"] = value_enum
 
         try:
-            if direction_enum is None:
-                settings = gpiod.LineSettings(output_value=value_enum)
-            else:
-                settings = gpiod.LineSettings(
-                    direction=direction_enum,
-                    output_value=value_enum,
-                )
+            settings = gpiod.LineSettings(**settings_kwargs)
         except TypeError:
-            settings = gpiod.LineSettings(output_value=value_enum)
+            settings = gpiod.LineSettings()
 
         request = gpiod.request_lines(
             chip_path,
@@ -205,8 +212,11 @@ def setup_gpio(cfg: dict):
 
             def set_value(self, value):
                 try:
-                    value_cls = getattr(self._gpiod, "LineValue", None) or getattr(
-                        self._gpiod, "Value", None
+                    line_mod = getattr(self._gpiod, "line", None)
+                    value_cls = (
+                        getattr(self._gpiod, "LineValue", None)
+                        or getattr(self._gpiod, "Value", None)
+                        or getattr(line_mod, "Value", None)
                     )
                     if value_cls is None:
                         raise AttributeError("No LineValue/Value enum found")
