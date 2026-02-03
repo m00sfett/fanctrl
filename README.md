@@ -93,6 +93,6 @@ Returns:
   "temp_c": 56.2,
   "temp_on_c": 55.0,
   "temp_off_c": 45.0,
-  "version": "0.4.0"
+  "version": "0.4.1"
 }
 ```
