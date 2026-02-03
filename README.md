@@ -75,7 +75,7 @@ temp_path = "/sys/class/thermal/thermal_zone0/temp"
 # Timing
 poll_interval_s = 5.0    # How often to check temp
 min_switch_s = 10.0      # Minimum time to stay in one state (hysteresis)
-log_each_read = false    # Log every poll or just changes
+log_each_read = true     # Log every poll or just changes
 ```
 
 ## PIN Mapping
@@ -93,6 +93,6 @@ Returns:
   "temp_c": 56.2,
   "temp_on_c": 55.0,
   "temp_off_c": 45.0,
-  "version": "0.4.1"
+  "version": "0.4.3"
 }
 ```
