@@ -6,14 +6,15 @@ services:
     environment:
       - FANCTRL_CONFIG=/config/fanctrl.toml
       - FANCTRL_STATUS_PORT=9101
-    ports:
-      - "9101:9101"
     volumes:
       - ./config:/config:ro
       - /sys:/sys:ro
     devices:
-      - /dev/gpiomem:/dev/gpiomem
       - /dev/gpiochip0:/dev/gpiochip0
-      - /dev/gpiochip1:/dev/gpiochip1
-    cap_add:
-      - SYS_RAWIO
+    networks:
+      - webstack_net
+
+networks:
+  webstack_net:
+    external: true
+    name: webstack_net

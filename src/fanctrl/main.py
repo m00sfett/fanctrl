@@ -102,7 +102,7 @@ class StatusHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
-    def log_message(self, fmt, *args):  # noqa: N802
+    def log_message(self, format, *args):  # noqa: N802
         return
 
 
@@ -151,7 +151,7 @@ def set_fan_state(ctx: dict, active_high: bool, on: bool) -> None:
 def setup_gpio(cfg: dict):
     # Only gpiod is supported
     try:
-        import gpiod
+        import gpiod  # type: ignore[reportMissingImports]
     except ImportError as exc:
         raise RuntimeError(f"gpiod import failed: {exc}. Install the 'gpiod' python package or system library.") from exc
 
@@ -268,6 +268,7 @@ def main() -> int:
          config_path = sys.argv[1]
 
     cfg = load_config(config_path)
+    version = read_version()
 
     if cfg["temp_off_c"] > cfg["temp_on_c"] or (cfg["temp_on_c"] - cfg["temp_off_c"]) < 1.0:
         warn(
@@ -308,7 +309,7 @@ def main() -> int:
     signal.signal(signal.SIGINT, shutdown)
     signal.signal(signal.SIGTERM, shutdown)
 
-    log(f"Version {read_version()}")
+    log(f"Version {version}")
     try:
         start_temp = read_temp_c(cfg["temp_path"])
     except Exception:
@@ -331,7 +332,7 @@ def main() -> int:
             "max_c": None,
             "temp_on_c": cfg["temp_on_c"],
             "temp_off_c": cfg["temp_off_c"],
-            "version": read_version(),
+            "version": version,
             "switchpoints": [],
         }
     )
@@ -358,7 +359,7 @@ def main() -> int:
                     "temp_on_c": cfg["temp_on_c"],
                     "temp_off_c": cfg["temp_off_c"],
                     "error": "temp_read_failed",
-                    "version": read_version(),
+                    "version": version,
                     "switchpoints": list(switch_history),
                 }
             )
@@ -394,7 +395,7 @@ def main() -> int:
                 "max_c": round(max_temp, 1) if max_temp is not None else None,
                 "temp_on_c": cfg["temp_on_c"],
                 "temp_off_c": cfg["temp_off_c"],
-                "version": read_version(),
+                "version": version,
                 "switchpoints": list(switch_history),
             }
         )
