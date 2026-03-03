@@ -1,13 +1,17 @@
 # fanctrl
 
-**Version:** `0.5.4`
+**Version:** `1.0.0`
 
 A lightweight Python tool to control a fan based on system temperature, using `libgpiod`.
+
+## Tested Platforms
+- Core service tested in Docker on Raspberry Pi 3.
+- No verified results yet for other boards/architectures.
 
 ## Quick Start
 ```bash
 git clone https://github.com/m00sfett/fanctrl.git
-cd fanctrl/fanctrl
+cd fanctrl
 docker compose up -d --build
 ```
 
@@ -26,7 +30,7 @@ In current Home Assistant versions (2026.2+), add-ons are listed under **Apps**.
 ### From Source
 ```bash
 git clone https://github.com/m00sfett/fanctrl.git
-cd fanctrl/fanctrl
+cd fanctrl
 pip install .
 ```
 
@@ -34,9 +38,8 @@ pip install .
 1. Clone the repo and create a config:
 ```bash
 git clone https://github.com/m00sfett/fanctrl.git
-cd fanctrl/fanctrl
-mkdir -p config
-cp config/fanctrl.toml config/fanctrl.toml
+cd fanctrl
+# Edit config/fanctrl.toml to match your hardware.
 ```
 
 2. Start with Docker Compose:
@@ -52,7 +55,8 @@ docker compose logs -f fanctrl
 **Notes**
 - Ensure GPIO devices are passed through (`/dev/gpiochip*`, optionally `/dev/gpiomem`).
 - If your Pi exposes GPIO on a different chip, set `gpio_chip` in the config.
-- The status endpoint is available on port `9101`.
+- The status endpoint listens on `9101` inside the `fanctrl` container/network.
+- With the provided `docker-compose.yml`, no host port is published by default.
 
 ## Usage
 
@@ -93,8 +97,11 @@ log_each_read = true     # Log every poll or just changes
 - If you used `RPi.GPIO` "BOARD" mode pin 33 previously, find the corresponding BCM number (e.g. BCM 13) and use that as `gpio_pin`.
 
 ## Status Endpoint
-By default, a status server runs on port 9101:
-`GET http://localhost:9101/status`
+By default, a status server runs on port `9101` inside the container:
+`GET http://fanctrl:9101/status` (from another container on the same Docker network)
+
+If you publish the port explicitly, host access is possible:
+`GET http://<host-ip>:9101/status`
 
 Returns:
 ```json
@@ -103,7 +110,7 @@ Returns:
   "temp_c": 56.2,
   "temp_on_c": 55.0,
   "temp_off_c": 45.0,
-  "version": "0.5.4"
+  "version": "1.0.0"
 }
 ```
 
