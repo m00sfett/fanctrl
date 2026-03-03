@@ -259,7 +259,7 @@ def cleanup_gpio(ctx: dict) -> None:
 
 
 def main() -> int:
-    config_path = os.environ.get("FANCTRL_CONFIG", "/config/config.toml")
+    config_path = os.environ.get("FANCTRL_CONFIG", "/config/fanctrl.toml")
     status_port = int(os.environ.get("FANCTRL_STATUS_PORT", "9101"))
     
     # CLI arg support for config path could be added here, 

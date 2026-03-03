@@ -1,6 +1,6 @@
 # fanctrl
 
-**Version:** `0.5.3`
+**Version:** `0.5.4`
 
 A lightweight Python tool to control a fan based on system temperature, using `libgpiod`.
 
@@ -103,7 +103,7 @@ Returns:
   "temp_c": 56.2,
   "temp_on_c": 55.0,
   "temp_off_c": 45.0,
-  "version": "0.5.3"
+  "version": "0.5.4"
 }
 ```
 
