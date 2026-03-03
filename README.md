@@ -4,6 +4,13 @@
 
 A lightweight Python tool to control a fan based on system temperature, using `libgpiod`.
 
+## Quick Start
+```bash
+git clone https://github.com/m00sfett/fanctrl.git
+cd fanctrl/fanctrl
+docker compose up -d --build
+```
+
 ## Features
 - **Backend**: Uses strict `libgpiod` (modern Linux GPIO). no legacy `RPi.GPIO` dependency.
 - **Configurable**: Set thresholds, poll intervals, and GPIO lines via TOML config or environment variables.
@@ -98,3 +105,7 @@ Returns:
   "version": "0.5.2"
 }
 ```
+
+## Troubleshooting
+- `gpiod import failed`: ensure the runtime has Python `gpiod` bindings installed.
+- `GPIO chip not found`: verify the correct `/dev/gpiochipX` device is passed through.
