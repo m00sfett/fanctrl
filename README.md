@@ -1,6 +1,6 @@
 # fanctrl
 
-**Version:** `0.5.2`
+**Version:** `0.5.3`
 
 A lightweight Python tool to control a fan based on system temperature, using `libgpiod`.
 
@@ -19,6 +19,7 @@ docker compose up -d --build
 
 ## Home Assistant
 If you are looking for the Home Assistant Add-on, find it here: [ha-addon-fanctrl](https://github.com/m00sfett/ha-addon-fanctrl)
+In current Home Assistant versions (2026.2+), add-ons are listed under **Apps**.
 
 ## Installation
 
@@ -102,7 +103,7 @@ Returns:
   "temp_c": 56.2,
   "temp_on_c": 55.0,
   "temp_off_c": 45.0,
-  "version": "0.5.2"
+  "version": "0.5.3"
 }
 ```
 
