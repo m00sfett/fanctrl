@@ -1,5 +1,7 @@
 # fanctrl
 
+**Version:** `0.5.1`
+
 A lightweight Python tool to control a fan based on system temperature, using `libgpiod`.
 
 ## Features
